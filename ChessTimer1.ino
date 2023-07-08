@@ -1,8 +1,8 @@
 #include <LiquidCrystal_I2C.h>
-#define TimerButton1Input 7
-#define TimerButton2Input 8
-#define ChangeButtonInput 9
-#define ResetButtonInput 10
+#define TimerButton1Input 10
+#define TimerButton2Input 9
+#define ChangeButtonInput 8
+#define ResetButtonInput 7
 #define Led1 11
 #define Led2 5
 
@@ -42,7 +42,7 @@ int lcd_Rows = 2;      // Number of Rows in display
 LiquidCrystal_I2C lcd(0x3f, lcd_Columns, lcd_Rows);  // set the LCD address and number of Rows and Columns
 
 String text = "Made By";  // Put your required Text here
-int speed_Adjust = 150;   // Speed of moving Text
+int speed_Adjust = 100;   // Speed of moving Text
 int rest_Time = 0;        // Resting time of Text animation at the edges of display
 
 int text_Len;
@@ -159,21 +159,21 @@ void loop() {
     analogWrite(Led1, 0);
 
     if (TimerButton1) {
+      analogWrite(Led2, 0);
+      analogWrite(Led1, 100);
       lcd.clear();
       GameStarted = true;
       GameTurn = 2;
       Starter = 1;
-      analogWrite(Led2, 0);
-      analogWrite(Led1, 100);
       startPlayer2Timer(Gamemodetime);
     }
     if (TimerButton2) {
+      analogWrite(Led1, 0);
+      analogWrite(Led2, 100);
       lcd.clear();
       GameStarted = true;
       GameTurn = 1;
       Starter = 2;
-      analogWrite(Led1, 0);
-      analogWrite(Led2, 100);
       startPlayer1Timer(Gamemodetime);
     }
 
@@ -195,21 +195,21 @@ void loop() {
       }
 
       if (GameTurn == 2 && TimerButton2) {
+        lcd.clear();
         startPlayer1Timer(player1RemainingTime);
+        analogWrite(Led1, 0);
+        analogWrite(Led2, 100);
         player2RemainingTime = player2RemainingTime + GamemodePlustime;
         GameTurn = 1;
-        analogWrite(Led2, 100);
-        analogWrite(Led1, 0);
-        lcd.clear();
       }
 
       if (GameTurn == 1 && TimerButton1) {
+        lcd.clear();
         startPlayer2Timer(player2RemainingTime);
-        player1RemainingTime = player1RemainingTime + GamemodePlustime;
-        GameTurn = 2;
         analogWrite(Led2, 0);
         analogWrite(Led1, 100);
-        lcd.clear();
+        player1RemainingTime = player1RemainingTime + GamemodePlustime;
+        GameTurn = 2;
       }
 
       if (ResetButton) {
@@ -246,7 +246,12 @@ void loop() {
         lcd.clear();
         analogWrite(Led1, 0);
         lcd.setCursor(3, 0);
-        lcd.print("White Win!");
+        if (Starter == 1) {
+          lcd.print("White Win!");
+        }
+        if (Starter == 2) {
+          lcd.print("Black Win!");
+        }
         analogWrite(Led2, 100);
         delay(1000);
         analogWrite(Led2, 0);
@@ -260,7 +265,6 @@ void loop() {
         analogWrite(Led2, 0);
         delay(1000);
         lcd.clear();
-        analogWrite(Led2, 0);
         player1RemainingTime = 0;
         player2RemainingTime = 0;
         GameStarted = false;
@@ -269,7 +273,12 @@ void loop() {
         lcd.clear();
         analogWrite(Led2, 0);
         lcd.setCursor(3, 0);
-        lcd.print("Black Win!");
+        if (Starter == 2) {
+          lcd.print("White Win!");
+        }
+        if (Starter == 1) {
+          lcd.print("Black Win!");
+        }
         analogWrite(Led1, 100);
         delay(1000);
         analogWrite(Led1, 0);
@@ -293,13 +302,25 @@ void loop() {
       stopTimers();
       lcd.setCursor(3, 0);
       lcd.print("Game Paused");
-      if (GameTurn == 1) {
-        lcd.setCursor(3, 1);
-        lcd.print("Whites Turn");
+      if (Starter == 2) {
+        if (GameTurn == 1) {
+          lcd.setCursor(3, 1);
+          lcd.print("Blacks Turn");
+        }
+        if (GameTurn == 2) {
+          lcd.setCursor(3, 1);
+          lcd.print("Whites Turn");
+        }
       }
-      if (GameTurn == 2) {
-        lcd.setCursor(3, 1);
-        lcd.print("Blacks Turn");
+      if (Starter == 1) {
+        if (GameTurn == 2) {
+          lcd.setCursor(3, 1);
+          lcd.print("Blacks Turn");
+        }
+        if (GameTurn == 1) {
+          lcd.setCursor(3, 1);
+          lcd.print("Whites Turn");
+        }
       }
       if (ChangeButton && buttonfree) {
         if (GameTurn == 2) {
