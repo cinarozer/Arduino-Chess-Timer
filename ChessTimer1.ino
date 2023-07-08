@@ -34,14 +34,16 @@ bool GamePaused = false;
 
 bool buttonfree = true;
 
+int Starter;
+
 int lcd_Columns = 16;  // Number of columns in display
 int lcd_Rows = 2;      // Number of Rows in display
 
 LiquidCrystal_I2C lcd(0x3f, lcd_Columns, lcd_Rows);  // set the LCD address and number of Rows and Columns
 
 String text = "Made By";  // Put your required Text here
-int speed_Adjust = 150;         // Speed of moving Text
-int rest_Time = 0;            // Resting time of Text animation at the edges of display
+int speed_Adjust = 150;   // Speed of moving Text
+int rest_Time = 0;        // Resting time of Text animation at the edges of display
 
 int text_Len;
 
@@ -160,6 +162,7 @@ void loop() {
       lcd.clear();
       GameStarted = true;
       GameTurn = 2;
+      Starter = 1;
       analogWrite(Led2, 0);
       analogWrite(Led1, 100);
       startPlayer2Timer(Gamemodetime);
@@ -168,6 +171,7 @@ void loop() {
       lcd.clear();
       GameStarted = true;
       GameTurn = 1;
+      Starter = 2;
       analogWrite(Led1, 0);
       analogWrite(Led2, 100);
       startPlayer1Timer(Gamemodetime);
@@ -219,12 +223,20 @@ void loop() {
       }
 
       lcd.setCursor(1, 0);
-      lcd.print("White");
+      if (Starter == 1) {
+        lcd.print("White");
+      } else {
+        lcd.print("Black");
+      }
       lcd.setCursor(1, 1);
       lcd.print(p1mintime);
       lcd.print(" ");
       lcd.setCursor(10, 0);
-      lcd.print("Black");
+      if (Starter == 2) {
+        lcd.print("White");
+      } else {
+        lcd.print("Black");
+      }
       lcd.setCursor(10, 1);
       lcd.print(p2mintime);
       lcd.print(" ");
